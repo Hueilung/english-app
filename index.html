@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="英文練功">
+<title>英文練功 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --bg2: #1a1a22;
+    --bg3: #22222e;
+    --card: #1e1e28;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f0f5;
+    --text2: #8888aa;
+    --text3: #55556a;
+    --accent: #5b8af5;
+    --accent2: #3d6de0;
+    --green: #3ecf8e;
+    --green-bg: rgba(62,207,142,0.12);
+    --red: #f56565;
+    --red-bg: rgba(245,101,101,0.12);
+    --amber: #f6ad55;
+    --amber-bg: rgba(246,173,85,0.1);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+  .screen.active { display: flex; }
+
+  /* ── HOME SCREEN ── */
+  #home {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    gap: 0;
+  }
+
+  .home-top {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .app-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #5b8af5, #3d6de0);
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 8px 32px rgba(91,138,245,0.3);
+  }
+
+  .app-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .app-sub {
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 6px;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .stat-pill {
+    flex: 1;
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 8px;
+    text-align: center;
+  }
+
+  .stat-pill .num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .stat-pill .lbl {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 3px;
+  }
+
+  .mode-cards {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .mode-card {
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.3rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .mode-card:active { transform: scale(0.97); background: var(--bg3); }
+
+  .mode-card.zh2en { border-color: rgba(91,138,245,0.3); }
+  .mode-card.en2zh { border-color: rgba(62,207,142,0.3); }
+
+  .mode-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .zh2en .mode-icon { background: rgba(91,138,245,0.15); }
+  .en2zh .mode-icon { background: rgba(62,207,142,0.15); }
+
+  .mode-info { flex: 1; }
+  .mode-title { font-size: 16px; font-weight: 500; }
+  .mode-desc { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .mode-arrow { color: var(--text3); font-size: 18px; }
+
+  .mode-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-top: 4px;
+    display: inline-block;
+  }
+  .zh2en .mode-badge { background: rgba(91,138,245,0.15); color: var(--accent); }
+  .en2zh .mode-badge { background: var(--green-bg); color: var(--green); }
+
+  .data-status {
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text2);
+    padding: 12px;
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border);
+  }
+
+  .data-status.loading { color: var(--amber); }
+  .data-status.loaded { color: var(--green); }
+  .data-status.error { color: var(--red); }
+
+  /* ── QUIZ SCREEN ── */
+  #quiz {
+    padding: 0;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.2rem 0.8rem;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .back-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--bg3);
+    border: none;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .quiz-header-info { flex: 1; }
+
+  .quiz-mode-label {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .quiz-progress-text {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .session-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(91,138,245,0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--bg3);
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  .quiz-body {
+    flex: 1;
+    padding: 1.5rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* prompt card */
+  .prompt-card {
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prompt-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(91,138,245,0.08), transparent 70%);
+  }
+
+  .prompt-attr-tag {
+    font-size: 11px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: var(--bg3);
+    color: var(--text2);
+    border: 0.5px solid var(--border);
+  }
+
+  .prompt-question-label {
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .prompt-text {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+  }
+
+  .prompt-text.en { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; }
+
+  .speak-btn {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .speak-btn:active { background: var(--bg2); transform: scale(0.95); }
+
+  /* error hint */
+  .err-hint {
+    font-size: 12px;
+    color: var(--red);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* answer input */
+  .answer-wrap {
+    position: relative;
+  }
+
+  .answer-input {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    font-size: 22px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--text);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .answer-input:focus { border-color: var(--accent); }
+  .answer-input::placeholder { color: var(--text3); font-size: 16px; }
+
+  /* action buttons */
+  .action-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-main {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-main:active { background: var(--accent2); transform: scale(0.98); }
+
+  .btn-secondary {
+    padding: 16px 18px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text2);
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-secondary:active { background: var(--bg3); transform: scale(0.97); }
+
+  /* result panel */
+  .result-panel {
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .result-panel.show { display: flex; }
+  .result-panel.correct { background: var(--green-bg); border: 0.5px solid rgba(62,207,142,0.3); }
+  .result-panel.wrong { background: var(--red-bg); border: 0.5px solid rgba(245,101,101,0.3); }
+
+  .result-header {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .result-icon { font-size: 22px; }
+
+  .result-title { font-size: 15px; font-weight: 500; }
+  .result-panel.correct .result-title { color: var(--green); }
+  .result-panel.wrong .result-title { color: var(--red); }
+
+  .result-divider {
+    height: 0.5px;
+    background: var(--border);
+  }
+
+  .result-answer-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .result-answer-label { font-size: 11px; color: var(--text2); }
+
+  .result-answer-text {
+    font-size: 20px;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .result-panel.correct .result-answer-text { color: var(--green); }
+  .result-panel.wrong .result-answer-text { color: var(--text); }
+
+  /* judge buttons */
+  .judge-row {
+    display: flex;
+    gap: 10px;
+    display: none;
+  }
+  .judge-row.show { display: flex; }
+
+  .judge-btn {
+    flex: 1;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 0.5px solid;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .judge-btn:active { transform: scale(0.97); }
+
+  .judge-correct {
+    background: var(--green-bg);
+    color: var(--green);
+    border-color: rgba(62,207,142,0.3);
+  }
+  .judge-correct:active { background: rgba(62,207,142,0.2); }
+
+  .judge-wrong {
+    background: var(--red-bg);
+    color: var(--red);
+    border-color: rgba(245,101,101,0.3);
+  }
+  .judge-wrong:active { background: rgba(245,101,101,0.2); }
+
+  /* next button */
+  .next-btn {
+    width: 100%;
+    padding: 16px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--bg3);
+    color: var(--text);
+    font-size: 16px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    display: none;
+    transition: all 0.15s;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:active { background: var(--bg2); transform: scale(0.98); }
+
+  /* sync indicator */
+  .sync-indicator {
+    font-size: 12px;
+    color: var(--text2);
+    text-align: center;
+    padding: 6px;
+    display: none;
+  }
+  .sync-indicator.show { display: block; }
+  .sync-indicator.syncing { color: var(--amber); }
+  .sync-indicator.synced { color: var(--green); }
+  .sync-indicator.sync-error { color: var(--red); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeSlideUp 0.25s ease; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .pulsing { animation: pulse 1.2s infinite; }
+
+  /* safe area padding for iPhone */
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     HOME SCREEN
+════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="app-icon">📖</div>
+    <div class="app-title">英文練功 2026</div>
+    <div class="app-sub">你的個人英文學習夥伴</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-pill">
+      <div class="num" id="stat-total">—</div>
+      <div class="lbl">單字總數</div>
+    </div>
+    <div class="stat-pill">
+      <div class="num" id="stat-session">0</div>
+      <div class="lbl">今日練習</div>
+    </div>
+    <div class="stat-pill">
+      <div class="num" id="stat-acc">—</div>
+      <div class="lbl">正確率</div>
+    </div>
+  </div>
+
+  <div class="mode-cards">
+    <div class="mode-card zh2en" onclick="startQuiz('zh2en')">
+      <div class="mode-icon">🇹🇼</div>
+      <div class="mode-info">
+        <div class="mode-title">中文 → 英文</div>
+        <div class="mode-desc">看中文，說出英文</div>
+        <span class="mode-badge" id="badge-zh2en">載入中…</span>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+
+    <div class="mode-card en2zh" onclick="startQuiz('en2zh')">
+      <div class="mode-icon">🇬🇧</div>
+      <div class="mode-info">
+        <div class="mode-title">英文 → 中文</div>
+        <div class="mode-desc">聽英文，寫出中文</div>
+        <span class="mode-badge" id="badge-en2zh">載入中…</span>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="data-status loading pulsing" id="data-status">
+    正在載入你的單字庫…
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     QUIZ SCREEN
+════════════════════════════════════ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="quiz-header-info">
+      <div class="quiz-mode-label" id="quiz-mode-label">中文 → 英文</div>
+      <div class="quiz-progress-text" id="quiz-progress">第 1 題</div>
+    </div>
+    <div class="session-score" id="session-score">0 / 0</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <div class="quiz-body safe-bottom">
+    <!-- prompt -->
+    <div class="prompt-card fade-in" id="prompt-card">
+      <div class="prompt-attr-tag" id="prompt-attr" style="display:none"></div>
+      <div class="prompt-question-label" id="prompt-label">這個中文的英文是？</div>
+      <div class="prompt-text" id="prompt-text">—</div>
+      <button class="speak-btn" id="speak-btn" onclick="speakPrompt()">
+        🔊 <span>朗讀</span>
+      </button>
+      <div class="err-hint" id="err-hint" style="display:none">
+        ⚠ 此題已答錯 <span id="err-count">0</span> 次
+      </div>
+    </div>
+
+    <!-- answer input -->
+    <div class="answer-wrap" id="answer-wrap">
+      <input class="answer-input" id="answer-input"
+        type="text"
+        placeholder="輸入答案…"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter') checkAnswer()" />
+    </div>
+
+    <!-- action row -->
+    <div class="action-row" id="action-row">
+      <button class="btn-main" onclick="checkAnswer()">確認答案</button>
+      <button class="btn-secondary" onclick="skipQuestion()">跳過</button>
+    </div>
+
+    <!-- result panel -->
+    <div class="result-panel" id="result-panel">
+      <div class="result-header">
+        <span class="result-icon" id="result-icon">✓</span>
+        <span class="result-title" id="result-title">答對了！</span>
+      </div>
+      <div class="result-divider"></div>
+      <div class="result-answer-row">
+        <div class="result-answer-label">正確答案</div>
+        <div class="result-answer-text" id="result-answer">
+          <span id="result-answer-text">—</span>
+          <button class="speak-btn" id="answer-speak-btn" onclick="speakAnswer()" style="font-size:12px; padding: 4px 10px;">🔊</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- judge row (self-judge) -->
+    <div class="judge-row" id="judge-row">
+      <button class="judge-btn judge-correct" onclick="recordResult(true)">✓ 答對了</button>
+      <button class="judge-btn judge-wrong" onclick="recordResult(false)">✗ 答錯了</button>
+    </div>
+
+    <!-- sync indicator -->
+    <div class="sync-indicator" id="sync-indicator">同步中…</div>
+
+    <!-- next -->
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一題 →</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const SHEET_ID   = '1cVAuOWwjcHf3MZNeA3LsiBdfW9dJyuCaEKN3cfbm6yk';
+const SHEET_NAME = '英文練習';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylD5sehiSMAoWTB3G43ZCVI951-ym4dx347Rko5MfIhK0AtFffP_3B-h2dWz9Fh7Sz3Q/exec';
+
+// ── STATE ────────────────────────────────────────────────
+let data = [];
+let mode = 'zh2en';
+let currentItem = null;
+let sessionAsked = 0;
+let sessionCorrect = 0;
+let todayAsked = 0;
+let resultShown = false;
+
+// ── LOAD DATA ────────────────────────────────────────────
+async function loadData() {
+  const statusEl = document.getElementById('data-status');
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    const rows = json.table.rows;
+
+    data = rows
+      .filter(r => r.c[0] && r.c[0].v && r.c[1] && r.c[1].v)
+      .map((r, i) => ({
+        rowIndex: i + 2,
+        zh:      String(r.c[0].v).trim(),
+        en:      String(r.c[1].v).trim(),
+        attr:    r.c[2] ? String(r.c[2].v || '').trim() : '',
+        dCount:  r.c[3] ? (Number(r.c[3].v) || 0) : 0,
+        eCount:  r.c[4] ? (Number(r.c[4].v) || 0) : 0,
+        fCount:  r.c[5] ? (Number(r.c[5].v) || 0) : 0,
+        gCount:  r.c[6] ? (Number(r.c[6].v) || 0) : 0,
+      }));
+
+    if (data.length === 0) throw new Error('no data');
+
+    statusEl.className = 'data-status loaded';
+    statusEl.textContent = `✓ 已載入 ${data.length} 筆單字`;
+
+    document.getElementById('stat-total').textContent = data.length;
+
+    const zh2enErrors = data.reduce((s, d) => s + d.eCount, 0);
+    const en2zhErrors = data.reduce((s, d) => s + d.gCount, 0);
+    document.getElementById('badge-zh2en').textContent = zh2enErrors > 0 ? `待加強 ${zh2enErrors} 次` : '開始練習';
+    document.getElementById('badge-en2zh').textContent = en2zhErrors > 0 ? `待加強 ${en2zhErrors} 次` : '開始練習';
+
+  } catch(e) {
+    statusEl.className = 'data-status error';
+    statusEl.textContent = '⚠ 載入失敗，請確認 Sheets 已設定公開共用';
+  }
+}
+
+// ── 出題歷史（避免近期重複）──────────────────────────────
+let recentHistory = [];
+
+// ── 三階段出題演算法 ──────────────────────────────────────
+// 階段一（全面化）：優先把從未出現過的題目各出一次
+// 階段二（均衡化）：練習次數少的優先
+// 階段三（重點化）：全部都練過後，依錯誤率補強
+function pickItem() {
+  const histLimit = Math.min(8, Math.floor(data.length * 0.3));
+  const recentSet = new Set(recentHistory.slice(-histLimit));
+  const pool = data.filter(d => !recentSet.has(d.rowIndex));
+  const candidate = pool.length > 0 ? pool : data;
+
+  const getAsked = item => mode === "zh2en" ? item.dCount : item.fCount;
+  const getErr   = item => mode === "zh2en" ? item.eCount : item.gCount;
+
+  // 階段一：有沒有從未被問過的題目？全面化優先
+  const unseen = candidate.filter(d => getAsked(d) === 0);
+  if (unseen.length > 0) {
+    const picked = unseen[Math.floor(Math.random() * unseen.length)];
+    recentHistory.push(picked.rowIndex);
+    return picked;
+  }
+
+  // 階段二+三：全部都練過了，60% 看練習均衡，40% 看錯誤率
+  const minAsked = Math.min(...candidate.map(getAsked));
+  const maxAsked = Math.max(...candidate.map(getAsked));
+  const askedRange = maxAsked - minAsked || 1;
+
+  const weights = candidate.map(item => {
+    const asked = getAsked(item);
+    const err   = getErr(item);
+    const errRate = asked > 0 ? err / asked : 0;
+    const lessPracticed = 1 - (asked - minAsked) / askedRange;
+    return 0.1 + (lessPracticed * 0.6) + (errRate * 0.4);
+  });
+
+  const total = weights.reduce((a, b) => a + b, 0);
+  let rand = Math.random() * total;
+  for (let i = 0; i < candidate.length; i++) {
+    rand -= weights[i];
+    if (rand <= 0) {
+      recentHistory.push(candidate[i].rowIndex);
+      return candidate[i];
+    }
+  }
+  const last = candidate[candidate.length - 1];
+  recentHistory.push(last.rowIndex);
+  return last;
+}
+
+// ── NAVIGATION ───────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  updateHomeStats();
+  showScreen('home');
+}
+
+function updateHomeStats() {
+  const total = sessionAsked;
+  const acc = total > 0 ? Math.round(sessionCorrect / total * 100) + '%' : '—';
+  document.getElementById('stat-session').textContent = todayAsked;
+  document.getElementById('stat-acc').textContent = acc;
+}
+
+// ── START QUIZ ───────────────────────────────────────────
+function startQuiz(m) {
+  if (data.length === 0) {
+    alert('單字庫尚未載入，請稍候再試');
+    return;
+  }
+  mode = m;
+  sessionAsked = 0;
+  sessionCorrect = 0;
+  document.getElementById('quiz-mode-label').textContent = m === 'zh2en' ? '中文 → 英文' : '英文 → 中文';
+  showScreen('quiz');
+  showQuestion();
+}
+
+// ── SHOW QUESTION ────────────────────────────────────────
+function showQuestion() {
+  currentItem = pickItem();
+  sessionAsked++;
+  todayAsked++;
+  resultShown = false;
+
+  const isZh2En = mode === 'zh2en';
+  const prompt = isZh2En ? currentItem.zh : currentItem.en;
+  const errCount = isZh2En ? currentItem.eCount : currentItem.gCount;
+
+  // header
+  document.getElementById('quiz-progress').textContent = `第 ${sessionAsked} 題`;
+  updateScore();
+
+  // progress bar (0–100 based on session accuracy)
+  const acc = sessionAsked > 1 ? Math.round(sessionCorrect / (sessionAsked - 1) * 100) : 0;
+  document.getElementById('progress-bar').style.width = acc + '%';
+
+  // attr tag
+  const attrEl = document.getElementById('prompt-attr');
+  if (currentItem.attr) { attrEl.textContent = currentItem.attr; attrEl.style.display = ''; }
+  else { attrEl.style.display = 'none'; }
+
+  // label
+  document.getElementById('prompt-label').textContent = isZh2En ? '這個中文的英文是？' : '這個英文的中文是？';
+
+  // prompt text
+  const promptEl = document.getElementById('prompt-text');
+  promptEl.textContent = prompt;
+  promptEl.className = 'prompt-text' + (!isZh2En ? ' en' : '');
+
+  // error hint
+  const errHint = document.getElementById('err-hint');
+  if (errCount > 0) {
+    document.getElementById('err-count').textContent = errCount;
+    errHint.style.display = 'flex';
+  } else {
+    errHint.style.display = 'none';
+  }
+
+  // answer input
+  const inp = document.getElementById('answer-input');
+  inp.value = '';
+  inp.placeholder = isZh2En ? '輸入英文答案…' : '輸入中文意思…';
+
+  // reset UI
+  document.getElementById('answer-wrap').style.display = '';
+  document.getElementById('action-row').style.display = '';
+  document.getElementById('result-panel').className = 'result-panel';
+  document.getElementById('judge-row').className = 'judge-row';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('sync-indicator').className = 'sync-indicator';
+
+  // speak after short delay
+  setTimeout(() => speakText(prompt, isZh2En ? 'zh-TW' : 'en-US'), 350);
+  setTimeout(() => inp.focus(), 200);
+}
+
+// ── CHECK ANSWER ─────────────────────────────────────────
+function checkAnswer() {
+  if (resultShown) return;
+  const userAns = document.getElementById('answer-input').value.trim();
+  const correct = mode === 'zh2en' ? currentItem.en : currentItem.zh;
+
+  // hide input row, show result
+  document.getElementById('answer-wrap').style.display = 'none';
+  document.getElementById('action-row').style.display = 'none';
+
+  // show result card
+  const panel = document.getElementById('result-panel');
+  document.getElementById('result-answer-text').textContent = correct;
+
+  // show user answer if typed
+  if (userAns) {
+    const userDiv = document.createElement('div');
+    userDiv.innerHTML = `<div class="result-answer-label" style="margin-top:8px;">你的答案</div><div style="font-size:18px; color:var(--text2);">${userAns}</div>`;
+    panel.appendChild(userDiv);
+  }
+
+  // show judge buttons (self-assessment)
+  document.getElementById('judge-row').className = 'judge-row show';
+  panel.className = 'result-panel show';
+  resultShown = true;
+
+  // auto-speak correct answer
+  setTimeout(() => speakText(correct, mode === 'zh2en' ? 'en-US' : 'zh-TW'), 300);
+}
+
+function skipQuestion() {
+  nextQuestion();
+}
+
+// ── RECORD RESULT ────────────────────────────────────────
+async function recordResult(isCorrect) {
+  if (isCorrect) sessionCorrect++;
+
+  // update result panel colour
+  const panel = document.getElementById('result-panel');
+  panel.className = 'result-panel show ' + (isCorrect ? 'correct' : 'wrong');
+  document.getElementById('result-icon').textContent = isCorrect ? '✓' : '✗';
+  document.getElementById('result-title').textContent = isCorrect ? '答對了！繼續保持' : '答錯了，加油！';
+
+  // hide judge, show next
+  document.getElementById('judge-row').className = 'judge-row';
+  document.getElementById('next-btn').className = 'next-btn show';
+
+  updateScore();
+
+  // update local counts
+  const isZh2En = mode === 'zh2en';
+  if (isZh2En) { currentItem.dCount++; if (!isCorrect) currentItem.eCount++; }
+  else          { currentItem.fCount++; if (!isCorrect) currentItem.gCount++; }
+
+  // sync to Sheets
+  const syncEl = document.getElementById('sync-indicator');
+  syncEl.className = 'sync-indicator show syncing';
+  syncEl.textContent = '同步到試算表中…';
+
+  const askCol = isZh2En ? 4 : 6; // D=4, F=6
+  const errCol = isZh2En ? 5 : 7; // E=5, G=7
+  const row = currentItem.rowIndex;
+
+  try {
+    // always increment ask count
+    await postUpdate(row, askCol, 1);
+    // only increment error count if wrong
+    if (!isCorrect) await postUpdate(row, errCol, 1);
+
+    syncEl.className = 'sync-indicator show synced';
+    syncEl.textContent = '✓ 已同步到試算表';
+  } catch(e) {
+    syncEl.className = 'sync-indicator show sync-error';
+    syncEl.textContent = '⚠ 同步失敗，請檢查網路';
+  }
+}
+
+async function postUpdate(row, col, increment) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ row, col, increment }),
+    mode: 'no-cors'
+  });
+  // no-cors returns opaque response; assume success if no throw
+}
+
+function nextQuestion() {
+  showQuestion();
+}
+
+// ── SCORE ────────────────────────────────────────────────
+function updateScore() {
+  document.getElementById('session-score').textContent =
+    `${sessionCorrect} / ${sessionAsked > 0 ? sessionAsked - 1 : 0}`;
+}
+
+// ── SPEECH ───────────────────────────────────────────────
+function speakText(text, lang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang;
+  utt.rate = 0.88;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakPrompt() {
+  if (!currentItem) return;
+  const isZh2En = mode === 'zh2en';
+  speakText(isZh2En ? currentItem.zh : currentItem.en, isZh2En ? 'zh-TW' : 'en-US');
+}
+
+function speakAnswer() {
+  if (!currentItem) return;
+  const isZh2En = mode === 'zh2en';
+  speakText(isZh2En ? currentItem.en : currentItem.zh, isZh2En ? 'en-US' : 'zh-TW');
+}
+
+// ── INIT ─────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
