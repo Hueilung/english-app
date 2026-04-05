@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="英文練功">
+<title>英文練功 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 18px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; background: #f0ede8; min-height: 100vh; }
+
+  .header { background: #fff; border-bottom: 2px solid #e0ddd6; padding: 18px 20px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+  .logo { width: 46px; height: 46px; border-radius: 13px; background: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; font-weight: 700; flex-shrink: 0; }
+  .header-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .header-sub { font-size: 14px; color: #999; margin-top: 2px; }
+  .data-badge { margin-left: auto; font-size: 14px; color: #2563EB; background: #eff6ff; padding: 5px 13px; border-radius: 20px; font-weight: 600; display: none; }
+
+  .mode-wrap { padding: 18px 16px 0; }
+  .mode-switch { display: flex; background: #dedad4; border-radius: 16px; padding: 4px; }
+  .mode-btn { flex: 1; padding: 14px 0; border: none; background: transparent; border-radius: 13px; font-size: 18px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.18s; }
+  .mode-btn.active { background: #fff; color: #1a1a1a; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+
+  .stats-wrap { display: flex; gap: 10px; padding: 16px 16px 0; }
+  .stat-card { flex: 1; background: #fff; border-radius: 14px; padding: 12px 10px; text-align: center; }
+  .stat-label { font-size: 13px; color: #bbb; margin-bottom: 3px; }
+  .stat-num { font-size: 28px; font-weight: 700; color: #1a1a1a; }
+  .stat-num.green { color: #16a34a; }
+  .stat-num.blue { color: #2563EB; }
+
+  .q-wrap { padding: 16px 16px 0; }
+  .q-card { background: #fff; border-radius: 22px; padding: 36px 24px 28px; text-align: center; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  .q-label { font-size: 15px; color: #bbb; }
+  .q-text { font-size: 34px; font-weight: 700; color: #1a1a1a; line-height: 1.3; word-break: break-word; }
+  .q-attr { font-size: 14px; color: #2563EB; background: #eff6ff; padding: 5px 16px; border-radius: 20px; font-weight: 500; }
+  .speak-btn { background: #f0ede8; border: none; border-radius: 50%; width: 52px; height: 52px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .speak-btn:active { background: #dedad4; }
+  .err-badge { display: inline-block; background: #fee2e2; color: #dc2626; font-size: 14px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+
+  .ans-wrap { padding: 14px 16px 0; }
+  .ans-input { width: 100%; font-size: 24px; padding: 18px 16px; border: 2.5px solid #e0ddd6; border-radius: 16px; background: #fff; color: #1a1a1a; text-align: center; outline: none; transition: border-color 0.15s; }
+  .ans-input:focus { border-color: #2563EB; }
+
+  .btn-wrap { padding: 14px 16px 0; display: flex; gap: 10px; }
+  .btn-check { flex: 1; padding: 18px; font-size: 20px; font-weight: 700; border: none; border-radius: 16px; background: #2563EB; color: #fff; cursor: pointer; }
+  .btn-check:active { background: #1d4ed8; }
+  .btn-skip { padding: 18px 20px; font-size: 18px; border: 2.5px solid #e0ddd6; border-radius: 16px; background: #fff; color: #aaa; cursor: pointer; }
+
+  .result-wrap { padding: 14px 16px 0; }
+  .result-card { border-radius: 18px; padding: 20px; }
+  .result-card.show { background: #f8fffe; border: 2px solid #a7f3d0; }
+  .divider { border: none; border-top: 1.5px solid rgba(0,0,0,0.08); margin: 14px 0; }
+  .ans-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .ans-row-label { font-size: 15px; color: #bbb; white-space: nowrap; }
+  .ans-row-val { font-size: 20px; color: #1a1a1a; text-align: right; line-height: 1.4; word-break: break-word; }
+  .ans-row-val.correct-val { color: #15803d; font-weight: 700; font-size: 22px; }
+  .ans-row-speak { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px 6px; flex-shrink: 0; }
+
+  .judge-label { padding: 16px 16px 0; font-size: 20px; font-weight: 700; color: #1a1a1a; text-align: center; }
+  .judge-wrap { padding: 12px 16px 0; display: flex; gap: 10px; }
+  .judge-btn { flex: 1; padding: 20px; font-size: 20px; font-weight: 700; border: 2.5px solid transparent; border-radius: 16px; cursor: pointer; }
+  .judge-correct { background: #f0fdf4; color: #15803d; border-color: #86efac; }
+  .judge-correct:active { background: #dcfce7; }
+  .judge-wrong { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+  .judge-wrong:active { background: #fee2e2; }
+
+  .update-status { margin: 12px 16px 0; padding: 16px 18px; border-radius: 14px; font-size: 17px; line-height: 1.6; }
+  .update-status.saving { background: #fffbeb; color: #92400e; border: 1.5px solid #fcd34d; }
+  .update-status.saved { background: #f0fdf4; color: #15803d; border: 1.5px solid #86efac; }
+  .update-status.failed { background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; }
+
+  .next-wrap { padding: 14px 16px 28px; }
+  .btn-next { width: 100%; padding: 20px; font-size: 20px; font-weight: 700; border: 2.5px solid #e0ddd6; border-radius: 16px; background: #fff; color: #1a1a1a; cursor: pointer; }
+  .btn-next:active { background: #f0ede8; }
+
+  .center-msg { text-align: center; padding: 4rem 2rem; color: #bbb; font-size: 20px; line-height: 2; }
+  .spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid #e0ddd6; border-top-color: #2563EB; border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .retry-btn { margin-top: 12px; padding: 16px 36px; border: 2.5px solid #e0ddd6; border-radius: 14px; background: #fff; font-size: 20px; font-weight: 600; color: #1a1a1a; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">英</div>
+  <div>
+    <div class="header-title">英文練功 2026</div>
+    <div class="header-sub" id="header-sub">載入中…</div>
+  </div>
+  <span class="data-badge" id="data-badge"></span>
+</div>
+
+<div class="mode-wrap">
+  <div class="mode-switch">
+    <button class="mode-btn active" id="btn-zh2en" onclick="setMode('zh2en')">中 → 英</button>
+    <button class="mode-btn" id="btn-en2zh" onclick="setMode('en2zh')">英 → 中</button>
+  </div>
+</div>
+
+<div id="app-body">
+  <div class="center-msg">
+    <div class="spinner"></div><br>
+    正在載入資料…
+  </div>
+</div>
+
+<script>
+const SHEET_ID = '1cVAuOWwjcHf3MZNeA3LsiBdfW9dJyuCaEKN3cfbm6yk';
+const SHEET_NAME = '英文練習';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylD5sehiSMAoWTB3G43ZCVI951-ym4dx347Rko5MfIhK0AtFffP_3B-h2dWz9Fh7Sz3Q/exec';
+
+let mode = 'zh2en', data = [], currentItem = null, session = { asked: 0, correct: 0 };
+
+async function loadData() {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    data = json.table.rows
+      .filter(r => r.c[0]?.v && r.c[1]?.v)
+      .map((r, i) => ({
+        rowIndex: i + 2,
+        zh: String(r.c[0].v).trim(),
+        en: String(r.c[1].v).trim(),
+        attr: r.c[2] ? String(r.c[2].v || '').trim() : '',
+        dCount: r.c[3] ? (Number(r.c[3].v)||0) : 0,
+        eCount: r.c[4] ? (Number(r.c[4].v)||0) : 0,
+        fCount: r.c[5] ? (Number(r.c[5].v)||0) : 0,
+        gCount: r.c[6] ? (Number(r.c[6].v)||0) : 0,
+      }));
+    document.getElementById('header-sub').textContent = SHEET_NAME;
+    const badge = document.getElementById('data-badge');
+    badge.textContent = data.length + ' 筆';
+    badge.style.display = '';
+    showQuestion();
+  } catch(e) {
+    document.getElementById('app-body').innerHTML = `
+      <div class="center-msg">❌ 載入失敗<br><br>
+      請先將試算表設為<br>「知道連結的人可以檢視」<br><br>
+      <button class="retry-btn" onclick="loadData()">重　試</button></div>`;
+  }
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-zh2en').className = 'mode-btn'+(m==='zh2en'?' active':'');
+  document.getElementById('btn-en2zh').className = 'mode-btn'+(m==='en2zh'?' active':'');
+  session = { asked: 0, correct: 0 };
+  if (data.length > 0) showQuestion();
+}
+
+function pickItem() {
+  const w = data.map(d => 1+(mode==='zh2en'?d.eCount:d.gCount)*2);
+  const total = w.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for (let i=0;i<data.length;i++){r-=w[i];if(r<=0)return data[i];}
+  return data[data.length-1];
+}
+
+function speak(text, lang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang=lang; u.rate=0.88;
+  window.speechSynthesis.speak(u);
+}
+
+function statsHTML() {
+  const pct = session.asked > 0 ? Math.round(session.correct/session.asked*100) : 0;
+  return `<div class="stats-wrap">
+    <div class="stat-card"><div class="stat-label">題數</div><div class="stat-num blue">${session.asked}</div></div>
+    <div class="stat-card"><div class="stat-label">答對</div><div class="stat-num green">${session.correct}</div></div>
+    <div class="stat-card"><div class="stat-label">正確率</div><div class="stat-num">${session.asked>0?pct+'%':'-'}</div></div>
+  </div>`;
+}
+
+function showQuestion() {
+  currentItem = pickItem();
+  session.asked++;
+  const prompt = mode==='zh2en' ? currentItem.zh : currentItem.en;
+  const lang = mode==='zh2en' ? 'zh-TW' : 'en-US';
+  const errCount = mode==='zh2en' ? currentItem.eCount : currentItem.gCount;
+  const errBadge = errCount>0 ? `<span class="err-badge">曾錯 ${errCount} 次</span>` : '';
+  const attrHtml = currentItem.attr ? `<span class="q-attr">${currentItem.attr}</span>` : '';
+
+  document.getElementById('app-body').innerHTML = `
+    ${statsHTML()}
+    <div class="q-wrap"><div class="q-card">
+      <div class="q-label">${mode==='zh2en'?'請說出英文':'請說出中文意思'}</div>
+      ${errBadge}
+      <div class="q-text">${prompt}</div>
+      ${attrHtml}
+      <button class="speak-btn" onclick="speak(${JSON.stringify(prompt)},'${lang}')">🔊</button>
+    </div></div>
+    <div class="ans-wrap">
+      <input class="ans-input" id="ans-input" type="text"
+        placeholder="${mode==='zh2en'?'輸入英文…':'輸入中文…'}"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter')checkAnswer()" />
+    </div>
+    <div class="btn-wrap">
+      <button class="btn-check" onclick="checkAnswer()">確認答案</button>
+      <button class="btn-skip" onclick="showQuestion()">跳過</button>
+    </div>`;
+
+  setTimeout(()=>speak(prompt,lang),500);
+  setTimeout(()=>{const el=document.getElementById('ans-input');if(el)el.focus();},200);
+}
+
+function checkAnswer() {
+  const inp = document.getElementById('ans-input');
+  if (!inp) return;
+  const userAns = inp.value.trim();
+  const correctAns = mode==='zh2en' ? currentItem.en : currentItem.zh;
+  const correctLang = mode==='zh2en' ? 'en-US' : 'zh-TW';
+  const prompt = mode==='zh2en' ? currentItem.zh : currentItem.en;
+  const promptLang = mode==='zh2en' ? 'zh-TW' : 'en-US';
+  const attrHtml = currentItem.attr ? `<span class="q-attr">${currentItem.attr}</span>` : '';
+
+  document.getElementById('app-body').innerHTML = `
+    ${statsHTML()}
+    <div class="q-wrap"><div class="q-card">
+      <div class="q-label">${mode==='zh2en'?'請說出英文':'請說出中文意思'}</div>
+      <div class="q-text">${prompt}</div>
+      ${attrHtml}
+      <button class="speak-btn" onclick="speak(${JSON.stringify(prompt)},'${promptLang}')">🔊</button>
+    </div></div>
+    <div class="result-wrap"><div class="result-card show">
+      <div class="ans-row">
+        <span class="ans-row-label">你的答案</span>
+        <span class="ans-row-val">${userAns||'（未填）'}</span>
+      </div>
+      <hr class="divider">
+      <div class="ans-row">
+        <span class="ans-row-label">正確答案</span>
+        <span class="ans-row-val correct-val">${correctAns}</span>
+        <button class="ans-row-speak" onclick="speak(${JSON.stringify(correctAns)},'${correctLang}')">🔊</button>
+      </div>
+    </div></div>
+    <div class="judge-label">你答對了嗎？</div>
+    <div class="judge-wrap">
+      <button class="judge-btn judge-correct" onclick="recordResult(true)">✓ 答對了</button>
+      <button class="judge-btn judge-wrong" onclick="recordResult(false)">✗ 答錯了</button>
+    </div>
+    <div id="update-status"></div>
+    <div class="next-wrap"><button class="btn-next" id="btn-next" style="display:none;" onclick="showQuestion()">下一題 →</button></div>`;
+
+  speak(correctAns, correctLang);
+}
+
+async function recordResult(isCorrect) {
+  if (isCorrect) session.correct++;
+  document.querySelectorAll('.judge-btn').forEach(b=>b.disabled=true);
+  const askCol = mode==='zh2en'?4:6;
+  const errCol = mode==='zh2en'?5:7;
+  const row = currentItem.rowIndex;
+  if (mode==='zh2en'){currentItem.dCount++;if(!isCorrect)currentItem.eCount++;}
+  else{currentItem.fCount++;if(!isCorrect)currentItem.gCount++;}
+
+  const statusEl = document.getElementById('update-status');
+  const nextBtn = document.getElementById('btn-next');
+  statusEl.className='update-status saving';
+  statusEl.textContent='正在更新試算表…';
+  try {
+    await updateCell(row,askCol,1);
+    if(!isCorrect) await updateCell(row,errCol,1);
+    statusEl.className='update-status saved';
+    statusEl.textContent=isCorrect?'✓ 已更新提問次數':`✓ 錯誤已記錄！第 ${row} 行 +1`;
+  } catch(e) {
+    statusEl.className='update-status failed';
+    statusEl.textContent=`⚠️ 網路失敗，請手動更新第 ${row} 行`;
+  }
+  if(nextBtn)nextBtn.style.display='';
+}
+
+async function updateCell(row,col,increment){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({row,col,increment})});
+  const json=await res.json();
+  if(!json.success)throw new Error(json.error);
+}
+
+loadData();
+</script>
+</body>
+</html>
